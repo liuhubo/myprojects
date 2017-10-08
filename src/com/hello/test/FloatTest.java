@@ -8,6 +8,7 @@ public class FloatTest {
 			int b =20;
 			System.out.println(a/0);
 			System.out.println("浮点测试补丁");
+			System.out.println("浮点测试补丁2");
 	}
 
 }
