@@ -32,5 +32,14 @@ public class DataServiceImpl implements DataServiceIface {
 		return action.apply(redicClient);
 	}
 
-	
+	@Override
+	public void set(String k, String v, long timeout) {
+		exec(redicClient->redicClient.set(k, v, timeout));
+	}
+
+	@Override
+	public void Rpublish(String channel,String msg) {
+		exec(redicClient->redicClient.rPubMsg(channel, msg));
+	}
+
 }

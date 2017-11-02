@@ -91,4 +91,6 @@ public interface RedisClient {
 
     // 获取list中的元素
     List<String> lRange(String key, int start, int end);
+    
+    String rPubMsg(String channel,String msg);
 }

@@ -45,8 +45,6 @@ public class RedisTopicListener implements MessageListener {
     }
 
     private void bikeExpireNoData(String bikeNo) {
-        LogUtils.COMMON.debug("bikeNo:{} no data,send reset command",bikeNo);
-        //重启A7指令
-        bikeStateIface.resetBike(bikeNo, 1);
+       System.out.println(">>>redis receive bikeNo:"+bikeNo);
     }
 }

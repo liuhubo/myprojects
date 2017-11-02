@@ -54,6 +54,11 @@ public class RedisClientImpl implements RedisClient {
                 String pattern = "__keyspace@" + db + "__:" + Consts.REDIS_EXPIRE_EVENT_PREFIX + "*";
 //                LogUtils.PUSH.debug("pSubscribe pattern is {}", pattern);
                 connection.pSubscribe(_topicListener, pattern.getBytes());
+//                String pattern = "__keyspace@" + db + "__:" + Consts.REDIS_EXPIRE_EVENT_PREFIX + "*";
+                String p = "powerBikeBattery:*";
+//                LogUtils.PUSH.debug("pSubscribe pattern is {}", pattern);
+                System.out.println("--->subcribe topic pattern:"+p);
+                connection.pSubscribe(_topicListener, p.getBytes());
                 return true;
             }
         });
@@ -291,4 +296,10 @@ public class RedisClientImpl implements RedisClient {
     public List<String> lRange(String key, int start, int end) {
         return redisTemplate.opsForList().range(key, start, end);
     }
+
+	@Override
+	public String rPubMsg(String channel,String msg) {
+		redisTemplate.convertAndSend(channel, msg);
+		return msg;
+	}
 }
