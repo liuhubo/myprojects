@@ -10,7 +10,6 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 public class Mainmq {
 
 	public static void main(String[] args) {
-
 		ApplicationContext con = new ClassPathXmlApplicationContext("applicationContext.xml");
 		AmqpTemplate amqpTemplate = con.getBean(AmqpTemplate.class);
 		RabbitAdmin rabbitAdmin = con.getBean(RabbitAdmin.class);

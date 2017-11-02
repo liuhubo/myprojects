@@ -41,7 +41,7 @@ public class Producer {
 		AmqpTemplate amqpTemplate = context.getBean(AmqpTemplate.class);
 		while (true) {
 			amqpTemplate.convertAndSend(exchange, "", json);
-			System.out.println("Thread:"+Thread.currentThread().getId()+" send OK,sleep 1 sec");
+//			System.out.println("Thread:"+Thread.currentThread().getId()+" send OK,sleep 1 sec");
 			Thread.currentThread().sleep(1000L);
 		}
 	}

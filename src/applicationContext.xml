@@ -21,12 +21,12 @@
     </bean> 
     
     <import resource="datasource.xml"/>
-    <tx:annotation-driven/>
+    
 
     <task:annotation-driven scheduler="syncTestAccountScheduler"/>
-    <task:scheduler id="syncTestAccountScheduler" pool-size="10"/>
-
-    <context:component-scan base-package="com.easybike"/>-->
+    <task:scheduler id="syncTestAccountScheduler" pool-size="10"/>-->
+    <tx:annotation-driven/>
+    <context:component-scan base-package="com.hello"/>
 
     <!-- 创建SqlSessionFactory，同时指定数据源 -->
   <!--   <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
@@ -45,7 +45,7 @@
    <!--  <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
         <property name="basePackage" value="com.easybike.workflow.dao"/>
         <property name="sqlSessionTemplateBeanName" value="sqlSessionTemplateSimple"/>
-    </bean> 
+    </bean> -->
 	
 	<bean id="jedisPoolConfig"
           class="redis.clients.jedis.JedisPoolConfig">
@@ -62,10 +62,10 @@
 	
     <bean id="jedisConnectionFactory"
           class="org.springframework.data.redis.connection.jedis.JedisConnectionFactory">
-        <property name="hostName" value="${cacheRedis.host}"/>
-        <property name="port" value="${cacheRedis.port}"/>
-        <property name="database" value="${redis.db}"/>
-        <property name="password" value="${cacheRedis.password}"/>
+        <property name="hostName" value="127.0.0.1"/>
+        <property name="port" value="6379"/>
+        <property name="database" value="0"/>
+        <property name="password" value="hello@123"/>
         <property name="poolConfig" ref="jedisPoolConfig" />
     </bean>
 
@@ -73,23 +73,23 @@
           p:connection-factory-ref="jedisConnectionFactory"/>
           
     <bean id="jedisClusterPoolConfig" class="redis.clients.jedis.JedisPoolConfig" scope="prototype">
-        <property name="minIdle" value="${jedis.pool.minIdle}"/>
-        <property name="maxIdle" value="${jedis.pool.maxIdle}"/>
-        <property name="maxTotal" value="${jedis.pool.maxTotal}"/>
-        <property name="testOnBorrow" value="${jedis.pool.testOnBorrow}" />
-        <property name="testOnReturn" value="${jedis.pool.testOnReturn}"/>
+        <property name="minIdle" value="32"/>
+        <property name="maxIdle" value="64"/>
+        <property name="maxTotal" value="128"/>
+        <property name="testOnBorrow" value="true" />
+        <property name="testOnReturn" value="true"/>
         <property name="testWhileIdle" value="true"/>
         <property name="minEvictableIdleTimeMillis" value="60000"/>
         <property name="timeBetweenEvictionRunsMillis" value="30000"/>
         <property name="numTestsPerEvictionRun" value="-1"/>
     </bean>
 
-    <bean id="jedisClusterClient" class="com.easybike.workflow.util.redis.JedisClusterClient" factory-method="getInstance">
+   <!-- <bean id="jedisClusterClient" class="com.easybike.workflow.util.redis.JedisClusterClient" factory-method="getInstance">
         <constructor-arg name="poolConfig" ref="jedisClusterPoolConfig" />
         <constructor-arg name="host" value="${redisCluster.host}" />
         <constructor-arg name="port" value="${redisCluster.port}" />
-        <constructor-arg name="connectionTimeout" value="${redis.timeout}" />
-        <constructor-arg name="soTimeout" value="${redis.so_timeout}" />
+        <constructor-arg name="connectionTimeout" value="5000" />
+        <constructor-arg name="soTimeout" value="5000" />
         <constructor-arg name="maxAttempts" value="3" />
         <constructor-arg name="password"><null/></constructor-arg>
     </bean>--> 
