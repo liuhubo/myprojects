@@ -1,0 +1,2 @@
+#!/bin/bash
+redis-cli -h 10.46.73.48 -p 8386 -a TXyCchRVwAafjTXyC -n 1

@@ -1,0 +1,2 @@
+#!/bin/bash
+redis-cli -h 10.175.192.16 -p 7379 -a ckRedis@! -n 1

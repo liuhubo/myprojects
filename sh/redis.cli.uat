@@ -1,0 +1,4 @@
+#!/bin/bash
+echo “connecting dev redis...”
+ssh -t liuhubo@10.175.192.16 "cd /home/liuhubo;./redis.cli.uat"
+
