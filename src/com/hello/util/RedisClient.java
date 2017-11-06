@@ -88,7 +88,9 @@ public interface RedisClient {
 
     // 往list中插入元素
     String lPush(String key, String value);
-
+    //右边弹出元素
+    public String rPop(String key);
+    
     // 获取list中的元素
     List<String> lRange(String key, int start, int end);
     

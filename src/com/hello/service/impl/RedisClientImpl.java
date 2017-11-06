@@ -293,6 +293,11 @@ public class RedisClientImpl implements RedisClient {
     }
 
     @Override
+    public String rPop(String key) {
+        return redisTemplate.opsForList().rightPop(key);
+    }
+    
+    @Override
     public List<String> lRange(String key, int start, int end) {
         return redisTemplate.opsForList().range(key, start, end);
     }

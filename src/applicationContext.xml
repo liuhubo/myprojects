@@ -10,42 +10,39 @@
     http://www.springframework.org/schema/rabbit http://www.springframework.org/schema/rabbit/spring-rabbit-1.4.xsd
     http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-3.1.xsd">
 
-   <!-- <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="locations">
             <list>
-                <value>classpath:configs/jdbc.properties</value>
-                <value>classpath:configs/config.properties</value>
-                <value>classpath:configs/common.properties</value>
+                <value>classpath:jdbc.properties</value>
             </list>
         </property>
     </bean> 
     
     <import resource="datasource.xml"/>
     
-
-    <task:annotation-driven scheduler="syncTestAccountScheduler"/>
+<!--     <task:annotation-driven scheduler="syncTestAccountScheduler"/>
     <task:scheduler id="syncTestAccountScheduler" pool-size="10"/>-->
     <tx:annotation-driven/>
     <context:component-scan base-package="com.hello"/>
 
     <!-- 创建SqlSessionFactory，同时指定数据源 -->
-  <!--   <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
-        <property name="dataSource" ref="dynamicDataSource"/>
-        <property name="configLocation" value="classpath:mybatis/mybatis-config.xml"/>
-        <property name="mapperLocations" value="classpath:mybatis/mapper/*.xml"/>
-    </bean> -->
-
+   <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="configLocation" value="classpath:mybatis-config.xml"/>
+        <property name="mapperLocations" value="com/hello/mapper/*.xml"/>
+    </bean> 
+ 
     <!--通过模板定制mybatis的行为 -->
-    <!-- <bean id="sqlSessionTemplateSimple" class="org.mybatis.spring.SqlSessionTemplate">
+     <bean id="sqlSessionTemplateSimple" class="org.mybatis.spring.SqlSessionTemplate">
         <constructor-arg index="0" ref="sqlSessionFactory"/>
         <constructor-arg index="1" value="SIMPLE"/>
-    </bean> -->
+    </bean>
 
     <!-- 采用自动扫描方式创建mapper bean(单个更新模式) -->
-   <!--  <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
-        <property name="basePackage" value="com.easybike.workflow.dao"/>
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.hello.dao"/>
         <property name="sqlSessionTemplateBeanName" value="sqlSessionTemplateSimple"/>
-    </bean> -->
+    </bean>
 	
 	<bean id="jedisPoolConfig"
           class="redis.clients.jedis.JedisPoolConfig">

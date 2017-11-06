@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hello.dao.BikeDao">
+    <insert id="insertPowerBikeBatteryChange" >
+     insert into t_battery_change (guid,bike_no,city_guid,city_name,capacity_before,user_guid,user_name,user_phone,unlock_date) 
+     VALUES  
+     (#{powerBike.guid},
+      #{powerBike.bikeNo},
+      #{powerBike.cityGuid},
+      #{powerBike.cityName},
+      #{powerBike.capacityBefore},
+      #{powerBike.updateUserGuid},
+      #{powerBike.updateUserName},
+      #{powerBike.userPhone},
+      now()
+     )
+    </insert>
+    
+    <select id="getPowerBikeBatteryChangeRecord" resultType="com.hello.model.PowerBikeOperationLockRecord">
+    SELECT
+	  guid,
+	  bike_no         AS bikeNo,
+	  city_guid       AS cityGuid,
+	  city_name       AS cityName,
+	  capacity_before AS capacityBefore,
+	  user_guid       AS updateUserGuid,
+	  user_name       AS updateUserName,
+	  user_phone      AS userPhone,
+	  unlock_date     AS unlockDate,
+	  unlock_state    AS unlockState,
+	  failed_desc     AS unlockFailedDesc
+	FROM t_battery_change
+    <where>
+    <if test="powerInfo.bikeNo!=null" >
+    		AND bike_no=#{powerInfo.bikeNo}
+    </if>
+    <if test="powerInfo.cityGuid!=null">
+    		AND city_guid=#{powerInfo.cityGuid}
+    </if>
+    <if test="powerInfo.userPhone!=null">
+    		AND user_phone=#{powerInfo.userPhone}
+    </if>
+    <if test="powerInfo.unlockStart!=null">
+    		AND unlock_date &gt;=#{powerInfo.unlockStart}
+    </if>
+    <if test="powerInfo.unlockEnd!=null">
+    		AND unlock_date &lt;#{powerInfo.unlockEnd}
+    </if>
+    <if test="powerInfo.updateUserGuid!=null">
+        AND user_guid=#{powerInfo.updateUserGuid}
+    </if>
+    </where>
+    </select>
+    
+    <update id="updateBatteryChangeRecord">
+	UPDATE t_battery_change
+	SET bike_no =#{updatePower.bikeNo},
+	city_guid=#{updatePower.cityGuid},
+	city_name=#{updatePower.cityName},
+	capacity_before=#{updatePower.capacityBefore},
+	user_guid=#{updatePower.updateUserGuid},
+	user_name=#{updatePower.updateUserName},
+	user_phone=#{updatePower.userPhone},
+	unlock_date=now(),
+	failed_desc=#{updatePower.unlockFailedDesc},
+	unlock_state=#{updatePower.unlockState}
+	WHERE guid =#{updatePower.guid}
+    </update>
+    
+    <insert id="insertTran">
+    insert into t_tran values(
+    #{tran.id},
+    #{tran.detail}
+    )
+    </insert>
+    
+    <update id="updateTran">
+        update t_tran set id=id+1 where id=#{tran.id}
+    </update>
+</mapper>
