@@ -75,6 +75,6 @@
     </insert>
     
     <update id="updateTran">
-        update t_tran set id=id+1 where id=#{tran.id}
+        update t_tran set detail='sssss' where id=#{tran.id}
     </update>
 </mapper>

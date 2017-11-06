@@ -1,5 +1,10 @@
 package com.hello.service.impl;
 
+/**
+ * required 加入当前transac,如果没有开启新transac
+ *nested作为子transac加入当前transact,并取得savepoint,
+ *如果失败则roll back到此savepoint,只能外部transact提交了嵌套的transac才commit
+ */
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,25 +22,26 @@ public class TranService implements TranIface {
 	@Autowired
 	private BikeDao bikeDao;
 
-	@Transactional(rollbackFor = Throwable.class, propagation = Propagation.REQUIRED)
+	@Transactional(rollbackFor = Throwable.class, propagation = Propagation.NESTED)
 	@Override
 	public void insertTran(Tran tran) {
-	    String s ="";
-		for(int i=0;i<10;i++) {
-			bikeDao.insertTran(tran);
-			System.out.println(insertCnt.incrementAndGet()+"insert>>"+tran);
-			updateTran(tran);
-			if(i==3) {
-				s=s.substring(0, 12);
-			}
-		}
+		bikeDao.insertTran(tran);
+		System.out.println(insertCnt.incrementAndGet() + "insert>>" + tran);
+		updateTran(tran);
+//		if (tran.getId() == 3) {
+//			"".substring(0, 12);
+//		}
 	}
 
-	@Transactional(rollbackFor = Throwable.class, propagation = Propagation.REQUIRED)
+//	@Transactional(rollbackFor = Throwable.class, propagation = Propagation.REQUIRED)
 	@Override
 	public void updateTran(Tran tran) {
 		bikeDao.updateTran(tran);
 		System.out.println(updateCnt.incrementAndGet()+"update>>>"+tran);
+		
+		if(tran.getId()>=3) {
+			"".substring(0, 2);
+		}
 	}
 
 }
