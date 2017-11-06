@@ -102,6 +102,7 @@
     <!-- queue 队列声明-->
     <rabbit:queue durable="true" auto-delete="false" exclusive="false" name="queue_1"/>
     <rabbit:queue durable="true" auto-delete="false" exclusive="false" name="queue_2"/>
-    <!-- <bean id="startupListener" class="com.easybike.workflow.base.listener.StartupListener"/> -->
+    <rabbit:queue durable="true" auto-delete="false" exclusive="false" name="battery_unlock_state_queue"/>
+    <bean id="startupListener" class="com.hello.comm.StartupListener"/>
 
 </beans>
