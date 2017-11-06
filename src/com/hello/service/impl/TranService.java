@@ -3,7 +3,14 @@ package com.hello.service.impl;
 /**
  * required 加入当前transac,如果没有开启新transac
  *nested作为子transac加入当前transact,并取得savepoint,
+<<<<<<< HEAD
  *如果失败则roll back到此savepoint,只能外部transact提交了嵌套的transac才commit
+=======
+ *如果失败则roll back到此savepoint,只能外部transact提交了嵌套的transac才commit,同样适用于roll bak操作
+ *如果嵌套transac异常,外部有二种处理方式，1.内部以及回到savepoint,无脏数据，外部捕获内部exp，并做一些补偿操作,可以用一些特殊场景
+ *2.外部不做任何处理，根据自己配置决定commit还是roll bak
+ *
+>>>>>>> feat:transaction code
  */
 import java.util.concurrent.atomic.AtomicInteger;
 
