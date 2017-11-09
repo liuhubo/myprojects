@@ -1,0 +1,203 @@
+#!/bin/bash
+#
+# description: {{ APPID }} init script
+# processname: tomcat  
+# chkconfig: 234 20 80 
+
+APPID="com.easybike.push.server"
+USER="root"
+
+### paths
+PROJECT_DIR=/workspace/carkey/AppEasybikePushService/latest/
+MAIN_CLASS="com.carkey.core.container.Container"
+START_OPTS="$START_OPTS -DAPPID=$APPID"
+
+cd ${PROJECT_DIR}
+
+#Memory configs
+#MEM_OPTS="-Xms512m -Xmx512m -Xmn256m -XX:MaxMetaspaceSize=64m -XX:MetaspaceSize=64m"
+
+#Encoding
+ENCODING_PARAM="-Dfile.encoding=UTF-8"
+
+#GC OPTS
+GC_OPTS="$GC_OPTS -XX:+UseConcMarkSweepGC \
+-XX:+UseParNewGC \
+-XX:+UseCMSCompactAtFullCollection \
+-XX:CMSFullGCsBeforeCompaction=0 \
+-XX:CMSInitiatingOccupancyFraction=62 \
+-XX:CMSTriggerRatio=70"
+
+#GC logging
+GC_OPTS="$GC_OPTS -Xloggc:${PROJECT_DIR}/logs/gc.log"
+GC_OPTS="$GC_OPTS -XX:+PrintGCDateStamps -XX:+PrintGCDetails"
+GC_OPTS="$GC_OPTS -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=${PROJECT_DIR}/logs/heapdump.hprof"
+
+# JMX OPTS
+JMX_OPTS="$JMX_OPTS -Dcom.sun.management.jmxremote.port=10008 \
+-Dcom.sun.management.jmxremote.authenticate=false \
+-Dcom.sun.management.jmxremote.ssl=false \
+-Dcom.sun.management.jmxremote=true"
+
+START_OPTS="$START_OPTS -Djava.io.tmpdir=$PROJECT_DIR/temp/"
+START_OPTS="$START_OPTS -Duser.dir=$PROJECT_DIR"
+
+CLASS_PATH="$PROJECT_DIR/conf:$PROJECT_DIR/lib/*:$CLASS_PATH"
+
+
+# get pid
+getPid(){
+    if [ -z $1 ]
+    then
+        echo "Usage: $0 process-pattern" >&2
+        exit 1
+    fi
+
+    exc_pids="^$$$"
+    curr_pid=$$
+    while [ $curr_pid -gt 0 ]
+    do
+        curr_pid=`ps -fwwp $curr_pid|grep -v PPID|awk '{print $3}'`
+        exc_pids="$exc_pids|^$curr_pid$"
+    done
+    curr_script=$0
+    curr_script=${curr_script#.}
+    curr_script=${curr_script//./\\.}
+
+    if [ $# -eq 1 ]
+    then
+        ps -efww|grep "$1"|grep -Ev "grep|$curr_script"|awk '{print $2}'|grep -Ev $exc_pids
+    else
+        firstArg=$1
+        shift
+        ps -efww|grep "$firstArg "|grep "$*"|grep -Ev "grep|$curr_script"|awk '{print $2}'|grep -Ev $exc_pids
+    fi
+}
+
+#return value
+retval=0
+
+# start the server
+start(){
+    printf 'Starting the server\n'
+    pids=`getPid $APPID`
+    if ! [ -z "$pids" ];then
+        printf 'Existing process: %d\n' "$pids"
+        retval=1
+    else
+        #start
+        mkdir -p "$PROJECT_DIR/temp/"
+        mkdir -p "$PROJECT_DIR/logs/"
+        #echo "MEM_OPTS: $MEM_OPTS"
+        #echo "GC_OPTS: $GC_OPTS"
+        #echo "JMX_OPTS: $JMX_OPTS"
+        #echo "START_OPTS: $START_OPTS"
+        JAVA_CMD="nohup java -server $MEM_OPTS $ENCODING_PARAM $GC_OPTS $JMX_OPTS $START_OPTS -classpath $CLASS_PATH $MAIN_CLASS $PROJECT_DIR/conf/Configure.json > $PROJECT_DIR/logs/jvm_std.log 2>&1 &"
+        echo $JAVA_CMD
+        /bin/su $USER -c "$JAVA_CMD"
+        echo "Process pid: `getPid $APPID`"
+        sleep 3
+        if [ -z `getPid $APPID` ]
+        then
+            echo "Failed to start the server"
+            retval=1
+        else
+            echo "Finish $0"
+            retval=0
+        fi
+    fi
+}
+
+# stop the server
+stop(){
+    printf 'Stopping the server\n'
+    pids=`getPid $APPID`
+    if [ -z "$pids" ]
+    then
+        printf 'process is not running\n'
+        retval=0
+    else
+        #stop
+        max_loop=10
+        for ((i=0; i<$max_loop; i++))
+        do
+            pids=`getPid $APPID`
+            if [ -z "$pids" ]
+            then
+                break;
+            fi
+
+            if [ $i -gt 5 ]
+            then
+                _9="-9"
+            fi
+
+            for pid in $pids
+            do
+                echo "Kill process with pid:$pid and pattern:$MAIN_CLASS"
+                if ! kill $_9 $pid
+                then
+                    echo "Failed kill process with pid:$pid and pattern:$MAIN_CLASS"
+                else
+                    echo "Succeed kill process with pid:$pid and pattern:$MAIN_CLASS"
+                fi
+            done
+
+            sleep 3
+        done
+
+        if [ $i -eq $max_loop ]
+        then
+            echo_t "Failed kill the processes $pids after try $max_loop times"
+            retval=1
+        else
+            retval=0
+        fi
+    fi
+}
+
+# status for server
+status(){
+    pids=`getPid $APPID`
+    if ! [ -z "$pids" ];then
+        printf 'server is running: %d\n' "$pids"
+    else
+        printf 'server is stopped\n'
+    fi
+}
+
+user_exists(){
+        if id -u $1 >/dev/null 2>&1; then
+        echo "1"
+        else
+                echo "0"
+        fi
+}
+
+# dispatch the command
+case "$1" in
+    start)
+    start
+    ;;
+    stop)
+    stop
+    ;;
+    status)
+    status
+    ;;
+    restart)
+    stop
+    start
+    ;;
+    *)
+    printf 'Usage: %s {start|stop|restart|status}\n'
+    exit 1
+    ;;
+esac
+
+
+# exit
+exit "$retval"
+
+
+# END OF FILE

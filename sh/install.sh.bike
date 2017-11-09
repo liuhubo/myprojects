@@ -1,0 +1,37 @@
+#!/bin/bash
+ROOT_DIR="/workspace/carkey"
+SERVER_ROOT_DIR=$ROOT_DIR/AppEasybikeBikeService
+SERVER_DEFAULT_DIR=$SERVER_ROOT_DIR/latest
+
+main()
+{
+
+   if [ ! -d $ROOT_DIR ] ; then  
+      echo "not exist $ROOT_DIR"   
+      exit 1
+   fi
+   DATE=$(date +%Y-%m-%d-%H-%M-%S)
+   CUR_VERSION_DIR=$SERVER_ROOT_DIR/dev-${DATE}
+   echo "start to install easybike bike service to $CUR_VERSION_DIR"
+   
+   mkdir -p $CUR_VERSION_DIR
+   cp -f init.script $CUR_VERSION_DIR
+
+   cp -fr  ./conf/ $CUR_VERSION_DIR/conf
+   cp -fr  ./lib/ $CUR_VERSION_DIR/lib
+
+   if [ -L $SERVER_DEFAULT_DIR ] ;then
+       unlink $SERVER_DEFAULT_DIR
+   fi
+
+   if  [ -d $SERVER_DEFAULT_DIR ]  || [ -f  $SERVER_DEFAULT_DIR ] ; then
+       rm -rf $SERVER_DEFAULT_DIR
+   fi
+
+   ln -s $CUR_VERSION_DIR $SERVER_DEFAULT_DIR
+
+   echo "finished to install easybike bike service to $CUR_VERSION_DIR"
+
+}
+
+main
